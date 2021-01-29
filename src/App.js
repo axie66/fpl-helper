@@ -4,7 +4,7 @@ import { Grid, AppBar, Toolbar, Typography, Card, Paper, Container,Box,
          Drawer, Divider, CardContent, CardMedia, Button, 
          IconButton, List, ListItem, ListItemText, TextField, Select,
          FormControl, InputLabel, MenuItem, CardActionArea, Fade, Modal,
-         Backdrop, CircularProgress
+         Backdrop, CircularProgress, Hidden,
         } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
 import HomeIcon from '@material-ui/icons/Home';
@@ -14,6 +14,7 @@ import { makeStyles, createMuiTheme } from '@material-ui/core/styles';
 import SportsSoccerIcon from '@material-ui/icons/SportsSoccer';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import PersonIcon from '@material-ui/icons/Person';
+import GroupIcon from '@material-ui/icons/Group';
 
 import {createAuthProvider} from 'react-token-auth'
 
@@ -66,7 +67,7 @@ const drawerWidth = 0;
 
 const useHeaderStyles = makeStyles((theme) => ({
   title: {
-    marginLeft: 40,
+    marginLeft: 10,
     flex: 1,
     textDecoration: 'none',
   },
@@ -88,7 +89,6 @@ function Header() {
     <React.Fragment>
       <AppBar className={classes.appBar} position='fixed'>
         <Toolbar>
-          <SportsSoccerIcon />
           <Link to='/' className={classes.title}>
             <Button style={{borderRadius: '10px'}}>
               <Typography className={classes.typography}>FPL Helper</Typography>
@@ -102,6 +102,11 @@ function Header() {
           <Link to='/players'>
             <IconButton aria-label="Go to homepage" color='secondary'>
               <PersonIcon />          
+            </IconButton>
+          </Link>
+          <Link to='/team'>
+            <IconButton aria-label="Go to homepage" color='secondary'>
+              <GroupIcon />          
             </IconButton>
           </Link>
           <Link to='/login'>
@@ -194,10 +199,10 @@ const allStatToReadable = {
   'cost_change_event': 'GW ΔCost',
   'cost_change_start': 'Total ΔCost',
   'creativity': 'Creativity', 
-  'dreamteam_count': '# in Dreamteam',
+  'dreamteam_count': 'Dreamteam #',
   'event_points': 'GW Points',
   'form': 'Form', 
-  'goals_conceded': 'Goals Conceded',
+  'goals_conceded': 'Conceded',
   'ict_index': 'ICT',
   'influence': 'Influence',
   'minutes': 'Minutes',
@@ -211,9 +216,9 @@ const allStatToReadable = {
   'selected_by_percent': '% Selected',
   'threat': 'Threat',
   'transfers_in': 'Transfers In',
-  'transfers_in_event': 'GW Transfers In',
+  'transfers_in_event': 'GW In',
   'transfers_out': 'Transfers Out',
-  'transfers_out_event': 'GW Transfers Out',
+  'transfers_out_event': 'GW Out',
   'value_season': 'Value',
   'yellow_cards': 'Yellow Cards'
 }
@@ -243,29 +248,29 @@ function PlayerCard(props) {
           </Box>
           <Box flexGrow={1}>
             <CardContent>
-                <Typography color='textSecondary' align='center' paragraph={true} style={{fontSize: 18}} noWrap={true}>
-                  <span className={posClasses[pos]}>{posStrings[pos]}</span> • £{(props.data.now_cost / 10).toFixed(1)}
-                </Typography>
-                <Divider style={{marginTop: -10, marginBottom: 10}} />
-                {// Display stats
-                /*Object.keys(statToReadable).map((key) => (
-                  <Box display='flex' flexWrap='nowrap'>
-                    <Box><Typography>{statToReadable[key]}</Typography></Box>
-                    <Box flex={1} align='Right'><Typography>{props.data[key]}</Typography></Box>
-                  </Box>
-                ))*/}
-                <Grid container spacing={3}>
-                  <Grid item container direction='column' xs={6}>
-                    {Object.keys(statToReadable).map((key) => (
-                      <Grid key={key} item align='right'><Typography style={{fontWeight: 'bolder'}}>{statToReadable[key]}</Typography></Grid>
-                    ))}
-                  </Grid>
-                  <Grid item container direction='column' xs={6}>
-                    {Object.keys(statToReadable).map((key) => (
-                      <Grid item key={key}><Typography>{props.data[key]}</Typography></Grid>
-                    ))}
-                  </Grid>
+              <Typography color='textSecondary' align='center' paragraph={true} style={{fontSize: 18}} noWrap={true}>
+                <span className={posClasses[pos]}>{posStrings[pos]}</span> • £{(props.data.now_cost / 10).toFixed(1)}
+              </Typography>
+              <Divider style={{marginTop: -10, marginBottom: 10}} />
+              {// Display stats
+              /*Object.keys(statToReadable).map((key) => (
+                <Box display='flex' flexWrap='nowrap'>
+                  <Box><Typography>{statToReadable[key]}</Typography></Box>
+                  <Box flex={1} align='Right'><Typography>{props.data[key]}</Typography></Box>
+                </Box>
+              ))*/}
+              <Grid container spacing={3}>
+                <Grid item container direction='column' xs={6}>
+                  {Object.keys(statToReadable).map((key) => (
+                    <Grid key={key} item align='right'><Typography style={{fontWeight: 'bolder'}}>{statToReadable[key]}</Typography></Grid>
+                  ))}
                 </Grid>
+                <Grid item container direction='column' xs={6}>
+                  {Object.keys(statToReadable).map((key) => (
+                    <Grid item key={key}><Typography>{props.data[key]}</Typography></Grid>
+                  ))}
+                </Grid>
+              </Grid>
             </CardContent>
           </Box>
         </Box>
@@ -276,11 +281,12 @@ function PlayerCard(props) {
 
 function Players(props) {
   const perPage = 12;
-  const [playerDisplay, setPlayerDisplay] = useState(props.players);
-  const [offset, setOffset] = useState(0);
-  const [position, setPosition] = useState(-1);
-  const [sortBy, setSortBy] = useState(0);
+  const [ playerDisplay, setPlayerDisplay ] = useState(props.players);
+  const [ offset, setOffset ] = useState(0);
+  const [ position, setPosition ] = useState(-1);
+  const [ sortBy, setSortBy ] = useState(0);
   const [ playerData, setPlayerData ] = useState(null)
+  const [ open, setOpen ] = useState(false);
 
   let match = useRouteMatch();
 
@@ -346,7 +352,7 @@ function Players(props) {
                 setOffset(0)
                 const category = allStat[event.target.value]
                 setPlayerDisplay(props.players.sort((a, b) => 
-                ((a[category] > b[category]) ? -1 : 1)))
+                ((parseFloat(a[category]) > parseFloat(b[category])) ? -1 : 1)))
             }}>
               {
                 allStat.map((stat, i) => (
@@ -363,7 +369,7 @@ function Players(props) {
       <Grid container spacing={1} direction='row' justify='center'>
         {[...new Array(Math.min(playerDisplay.length - offset, perPage)).keys()].map((i) => (
             <Grid key={playerDisplay[offset + i].id} item xs={12} sm={6} lg={3} xl={3} style={{maxWidth: 400, minWidth: 290}}>
-              <PlayerCard data={playerDisplay[offset + i]} onClick={(data) => setPlayerData(data)} matchURL={props.matchURL}/>
+              <PlayerCard data={playerDisplay[offset + i]} onClick={(data) => {setPlayerData(data); setOpen(true)}} matchURL={props.matchURL}/>
             </Grid>)
         )}
       </Grid>
@@ -374,14 +380,14 @@ function Players(props) {
         aria-labelledby='transition-modal-title'
         aria-describedby='transition-modal-description'
         //className={classes.modal}
-        open={playerData !== null}
-        onClose={() => setPlayerData(null)}
+        open={open}
+        onClose={() => setOpen(false)}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{timeout: 500}}
       >
-        <Fade in={playerData !== null}>
-          <PlayerData data={playerData} onClick={() => setPlayerData(null)}/>
+        <Fade in={open}>
+          <PlayerData data={playerData} onClick={() => setOpen(false)}/>
         </Fade>
       </Modal>
     </div>
@@ -389,12 +395,39 @@ function Players(props) {
 }
 
 const usePlayerDataStyles = makeStyles({
+  // '@keyframes fadeIn': {
+  //   '0%': {opacity: 0},
+  //   '100%': {opacity: 1}
+  // },
+  // '@keyframes fadeOut': {
+  //   '0%': {opacity: 1},
+  //   '100%': {opacity: 0},
+  // },
+  root: {
+    margin: '10%',
+    marginTop: '15vh',
+    maxHeight: '70vh',
+    background: 'white',
+    //padding: 50,
+    display: 'flex',
+    overflow: 'scroll',
+    // animation: '$fadeIn',
+    // animationDuration: '0.5s',
+    // animationTimingFunction: 'linear',
+    // animationIterationCount: '1'
+  },
   header: {
     // display: 'flex',
     // // border: '10px solid black', 
     // margin: 'auto',
     // justifyContent: 'center',
-    padding: 20
+    background: 'linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(66,30,176,1) 100%)',
+    padding: 50,
+    color: 'white',
+    justifyContent: 'center',
+    [theme.breakpoints.down('xs')]: {
+      display: 'block'
+    }
   },
   name: {
     //position: 'absolute',
@@ -402,7 +435,13 @@ const usePlayerDataStyles = makeStyles({
     marginLeft: 30, 
     marginTop: 25,
     display: 'block',
-    flex: 1
+    flex: 1,
+    [theme.breakpoints.down('xs')]: {
+      marginLeft: 0,
+    }
+  },
+  divider: {
+    marginBottom: -15
   },
   imageCropper: {
     width: '150px',
@@ -410,9 +449,13 @@ const usePlayerDataStyles = makeStyles({
     position: 'relative',
     overflow: 'hidden',
     borderRadius: '50%',
-    border: '4px solid black',
     //margin: 'auto',
     //display: 'flex'
+    [theme.breakpoints.down('xs')]: {
+      display: 'flex',
+      margin:'auto',
+      marginTop: -10,
+    }
   },
   image: {
     //display: 'inline',
@@ -425,11 +468,17 @@ const usePlayerDataStyles = makeStyles({
     display: 'flex',
     margin: 'auto',
     marginTop: 50,
-    marginRight: 10,
+    marginRight: 20,
   },
   price: {
     marginLeft: 50,
-    marginTop: 45,
+    marginTop: 40,
+    display: 'flex',
+    [theme.breakpoints.down('xs')]: {
+      display: 'block',
+      marginLeft: 0,
+      marginTop: 5,
+    }
   },
   positionGkp: {
     color: '#3e007d',
@@ -443,6 +492,15 @@ const usePlayerDataStyles = makeStyles({
   positionFwd: {
     color: '#eb3434'
   },
+  text: {
+    //border: '1px solid black',
+    [theme.breakpoints.down('xs')]: {
+      textAlign: 'center',
+      justify: 'center',
+      justifyContent: 'center',
+      alignContent: 'center'
+    }
+  }
 })
 
 function PlayerData(props) {
@@ -452,38 +510,121 @@ function PlayerData(props) {
   const imgURL = `https://resources.premierleague.com/premierleague/photos/`
   + `players/110x140/p${props.data.code}.png`
 
-  return (
-    <Grid container direction='column' justify='center' spacing={2}>
+  // const posClasses = [classes.positionGkp, classes.positionDef, 
+  //                     classes.positionMid, classes.positionFwd]
 
-      <Grid item container>
-        <Grid item>
-          <IconButton title='Back' className={classes.exit} onClick={props.onClick}><ChevronLeftIcon style={{transform: 'scale(3)'}}/></IconButton>
+  const posColors = ['#3e007d', '#007d02', '#343deb', '#eb3434'];
+
+  return (
+    <Card className={classes.root} elevation={5}>
+      <div>
+        <Grid container className={classes.header} justify='center'>
+          {/* <Grid item>
+            <IconButton title='Back' className={classes.exit} onClick={props.onClick}>
+              <ChevronLeftIcon style={{transform: 'scale(3)', color: 'white'}}/>
+            </IconButton>
+          </Grid> */}
+          <Grid item className={classes.imageCropper} style={{border: '4px solid ' + posColors[props.data.element_type-1]}}>
+            <img alt={props.data.web_name} className={classes.image} src={imgURL}/>
+          </Grid>
+          <Grid item className={classes.name}>
+            <Hidden xsDown>
+              <Typography variant='h4' style={{marginLeft: 2}}>{props.data.first_name}</Typography>
+              <Typography variant='h3'>{props.data.second_name}</Typography>
+            </Hidden>
+            <Hidden smUp>
+              <div className={classes.text}>
+                <Typography justify='center' style={{fontSize: '10vw'}}>{props.data.web_name}</Typography>
+              </div>
+              <div>
+                <Divider orientation='horizontal' style={{marginTop: 15, marginBottom: 15, backgroundColor: 'white'}}/>
+              </div>
+            </Hidden>
+          </Grid>
+          <Grid item className={classes.price} spacing={3}>
+            <div style={{display: 'flex'}} className={classes.text}>
+              <Typography variant='h3'>
+                {posStrings[props.data.element_type-1]}
+              </Typography>
+            </div>
+            <Hidden xsDown>
+              <div item style={{display: 'flex', marginLeft: 25, marginRight: 25}}>
+                <Divider orientation='vertical' style={{height: '60px', backgroundColor: 'white'}}/>
+              </div>
+            </Hidden>
+            <div item style={{display: 'flex'}} className={classes.text}>
+              <Typography variant='h3' noWrap={true} >
+                £{(props.data.now_cost / 10).toFixed(1)}
+              </Typography>
+            </div>
+          </Grid>
         </Grid>
-        <Grid item className={classes.imageCropper}>
-          <img alt={props.data.web_name} className={classes.image} src={imgURL}/>
+
+        <Divider className={classes.divider} />
+      
+        <Grid container style={{padding: 50}}>
+          {
+            allStat.map((key) => (
+              <Grid item xs={12} sm={6} md={4}>
+                <Stat stat={allStatToReadable[key]} value={props.data[key]} />
+              </Grid>
+            ))
+          }
         </Grid>
-        <Grid item className={classes.name}>
-          <Typography variant='h4' style={{marginLeft: 2}}>{props.data.first_name}</Typography>
-          <Typography variant='h3'>{props.data.second_name}</Typography>
-        </Grid>
-        <Grid item className={classes.price}>
-          <Typography variant='h3'>£{(props.data.now_cost / 10).toFixed(1)} mil</Typography>
-        </Grid>
-      </Grid>
-      {/* <Grid item>
-        <Divider style={{width: '50%'}}/>
-      </Grid> */}
-    </Grid>
+      </div>
+    </Card>
   )
 }
 
-function PlayerPage() {
-  let { pid } = useParams();
+const useStatStyles = makeStyles({
+  root: {
+    display: 'block',
+    margin: 10,
+  },
+  left: {
+    display: 'flex',
+    flex: 0,
+    marginBottom: -5,
+  },
+  bar: {
+    display: 'flex',
+    flex: 1,
+    //border: '1px solid black', 
+    maxHeight: 10,
+  },
+  data: {
+    minWidth: '80px',
+    marginLeft: 10,
+    marginTop: -5
+  }
+})
 
-  console.log(pid)
+function Stat(props) {
+  const classes = useStatStyles();
 
-  return <Typography style={{margin:'auto', display:'flex'}}>The ID of the player is: {pid}</Typography>
-
+  return (
+    <div className={classes.root}>
+      <div className={classes.left}>
+        <Typography noWrap={true} style={{fontWeight: 'bold'}}>
+          {props.stat}
+        </Typography>
+      </div>
+      <div style={{display: 'flex'}}>
+        <div className={classes.bar}>
+          <svg viewBox='0 0 100 4'>
+            {/* <rect width='100%' height='100%' stroke='green'/> */}
+            <rect width='100%' height='100%' fill='black' />
+            <rect width='80%' height='100%' fill='blue' />
+          </svg>
+        </div>
+        <div className={classes.data}>
+          <Typography align='left'>
+            {props.value}
+          </Typography>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function Content() {
@@ -585,6 +726,103 @@ function Main() {
   )
 }
 
+const useTeamStyles = makeStyles({
+  field: {
+    margin: 'auto',
+    height: '80vh',
+    display: 'flex',
+    width: '80%'
+    //width: '35vh',
+    //border: '1px solid black'
+    // transform: 'rotate3d(1,0,0, 45deg)'
+  },
+  grass: {
+  },
+  draggable: {
+    cursor: 'move'
+  }
+})
+
+function Team() {
+  const classes = useTeamStyles();
+
+  const height = 120;
+  const width = 120;
+  const iconWidth = 20;
+  
+  const mins = [3, 2, 1];
+
+  const formation = [4, 4, 2];
+  const ys = [80, 50, 20];
+  const margins = [ 15, 20, 25 ];
+  const spacing = [0, 0, 20, 10, 5, 3];
+  var coords = [];
+
+  
+  for (var i = 0; i < 3; i++) {
+    var pos = formation[i]
+    var cx = width / 2 - (spacing[pos] + iconWidth) * (pos-1) / 2
+    for (var j = 0; j < pos; j++) {
+      coords.push([cx, ys[i]])
+      cx += (iconWidth + spacing[pos])
+    }
+  }
+
+  function makeDraggable(evt) {
+    var svg = evt.target;
+    function startDrag(evt) {
+      console.log('evt')
+    }
+    function drag(evt) {
+      console.log('evt')
+    }
+    function endDrag(evt) {
+      console.log('evt')
+    }
+    svg.addEventListener('mousedown', startDrag);
+    svg.addEventListener('mousemove', drag);
+    svg.addEventListener('mouseup', endDrag);
+    svg.addEventListener('mouseleave', endDrag);
+  }
+  
+
+  return (
+    <div>
+      <svg className={classes.field} viewBox='0 0 120 120' 
+       xmlns="http://www.w3.org/2000/svg" onLoad={makeDraggable}>
+        <defs>
+          <pattern id='sonny' width='100%' height='100%' viewBox='0 0 512 512'>
+            <image href='https://resources.premierleague.com/premierleague/photos/players/110x140/p85971.png'
+             width='512' height='512' />
+          </pattern>
+        </defs>
+        {/* <rect className={classes.grass} width='100%' height='100%' stroke='black' fill='green' />
+        <line x1='0' y1='50%' x2='100%' y2='50%' stroke='white' />
+        <circle cx='50%' cy='50%' r='12%' stroke='white' fill='transparent'/>
+        <rect width='100%' height='100%' stroke='black' fill='transparent' strokeWidth='3' /> */}
+        <polygon points='10,110 110,110 95,0 25,0' fill='#32a852' stroke='black' />
+        <line x1='18.25' y1='50' x2='101.75' y2='50' stroke='white' />
+        <ellipse cx='60' cy='51' rx='12' ry='8' stroke='white' fill='transparent' />
+        <polygon points='52,110 68,110 67.4,106 52.6,106' stroke='white' fill='transparent'/>
+
+        <polygon points='10,110 110,110 95,0 25,0' fill='transparent' stroke='black' strokeWidth='1.5' />
+        
+        {/* Goalkeeper */}
+        {/* <circle cx='60' cy='105' r='10' fill='white'/>
+        <circle cx='60' cy='105' r='10' fill='url(#sonny)' stroke='black'/> */}
+
+        {/* Defenders */}
+        {coords.map(([x, y]) => (
+          <g key={x*1000 + y} className={classes.draggable}>
+            <circle cx={x} cy={y} r='10' fill='white'/>
+            <circle cx={x} cy={y} r='10' fill='url(#sonny)' stroke='black'/>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
 const useLoginStyles = makeStyles({
   box: {
     width: '50%',
@@ -640,12 +878,14 @@ function Login() {
           <Grid item>
             <TextField label='Username' variant='filled' 
               className={classes.input}
-              onChange={event => setUsername(event.target.value)}/>
+              onChange={event => setUsername(event.target.value)}
+            />
           </Grid>
           <Grid item>
             <TextField label='Password' variant='filled' 
               className={classes.input} type='password'
-              onChange={event => setPassword(event.target.value)}/>
+              onChange={event => setPassword(event.target.value)}
+            />
           </Grid>
           <Grid item>
             <Button style={{margin: 'auto', display: 'flex'}}
@@ -688,6 +928,9 @@ function App() {
                   </Route>
                   <Route path='/login'>
                     <Login />
+                  </Route>
+                  <Route path='/team'>
+                    <Team />
                   </Route>
                   <Route path="/">
                     <Main />

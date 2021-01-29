@@ -105,6 +105,12 @@ guard.init_app(app, User)
 
 fplData = FPLData(useCache=True)
 
+# Debugging purposes
+@app.before_request
+def log_request():
+    app.logger.debug("Request Headers %s", flask.request.headers)
+    return None
+
 @app.route('/api/data')
 def getPlayers():
     return jsonify(fplData.data)
@@ -119,9 +125,12 @@ def login():
     From https://yasoob.me/posts/how-to-setup-and-deploy-jwt-auth-using-react-and-flask/
     '''
     request = flask.request.get_json(force=True)
-    print(request)
+
     username = request.get('username', None)
     password = request.get('password', None)
+
+    app.logger.debug(f'username: {username}')
+    app.logger.debug(f'password: {password}')
     user = guard.authenticate(username, password)
     ret = {'access_token': guard.encode_jwt_token(user)}
     return ret, 200
