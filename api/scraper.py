@@ -2,6 +2,7 @@ import requests
 import pickle
 import datetime
 import os
+import sqlite3
 
 class FPLData(object):
     ROOT_URL         = 'https://fantasy.premierleague.com/api/bootstrap-static/'

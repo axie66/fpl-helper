@@ -49,6 +49,12 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
   )} />
 }
 
+// Helper Function
+function formatNumber (num) {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+}
+
+
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -552,7 +558,7 @@ function PlayerData(props) {
                 <Divider orientation='vertical' style={{height: '60px', backgroundColor: 'white'}}/>
               </div>
             </Hidden>
-            <div item style={{display: 'flex'}} className={classes.text}>
+            <div style={{display: 'flex'}} className={classes.text}>
               <Typography variant='h3' noWrap={true} >
                 £{(props.data.now_cost / 10).toFixed(1)}
               </Typography>
@@ -565,7 +571,7 @@ function PlayerData(props) {
         <Grid container style={{padding: 50}}>
           {
             allStat.map((key) => (
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item key={key} xs={12} sm={6} md={4}>
                 <Stat stat={allStatToReadable[key]} value={props.data[key]} />
               </Grid>
             ))
@@ -584,13 +590,13 @@ const useStatStyles = makeStyles({
   left: {
     display: 'flex',
     flex: 0,
-    marginBottom: -5,
+    marginBottom: -3,
   },
   bar: {
     display: 'flex',
     flex: 1,
     //border: '1px solid black', 
-    maxHeight: 10,
+    // maxHeight: 10,
   },
   data: {
     minWidth: '80px',
@@ -611,15 +617,15 @@ function Stat(props) {
       </div>
       <div style={{display: 'flex'}}>
         <div className={classes.bar}>
-          <svg viewBox='0 0 100 4'>
-            {/* <rect width='100%' height='100%' stroke='green'/> */}
-            <rect width='100%' height='100%' fill='black' />
-            <rect width='80%' height='100%' fill='blue' />
+          <svg width='100%' height='100%' style={{border: '1px solid black', height: '10px'}}>
+            {/* <rect width='100%' height='100%' stroke='orange' strokeWidth={5} fill='transparent'/> */}
+            <rect x='0' y='0' width='100%' height='100%' fill='black' />
+            <rect x='0' y='0' width='80%' height='100%' fill='green' />
           </svg>
         </div>
         <div className={classes.data}>
           <Typography align='left'>
-            {props.value}
+            {formatNumber(props.value)}
           </Typography>
         </div>
       </div>
@@ -840,8 +846,10 @@ const useLoginStyles = makeStyles({
 function doLogin(username, password) {
   fetch('/api/login', {
     method: 'POST',
-    username: username,
-    password: password,
+    body: JSON.stringify({
+      username: username,
+      password: password,
+    })
   })
   .then(response => {console.log(response); return response.json()})
   .then(json => console.log(json))

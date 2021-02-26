@@ -105,6 +105,21 @@ guard.init_app(app, User)
 
 fplData = FPLData(useCache=True)
 
+with app.app_context():
+    db.create_all()
+    if db.session.query(User).filter_by(username='Alex').count() < 1:
+        db.session.add(User(
+            username='Alex',
+            password=guard.hash_password('kyoto'),
+            roles='admin',
+            form='3-4-3',
+            defs='',
+            mids='',
+            fwds='',
+            gkps='',
+            bnch=''
+        ))
+
 # Debugging purposes
 @app.before_request
 def log_request():
