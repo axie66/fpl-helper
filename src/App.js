@@ -94,27 +94,27 @@ function Header() {
     <React.Fragment>
       <AppBar className={classes.appBar} position='fixed'>
         <Toolbar>
-          <Link to='/' className={classes.title}>
+          <Link to='/fpl-helper' className={classes.title}>
             <Button style={{borderRadius: '10px'}}>
               <Typography className={classes.typography}>FPL Helper</Typography>
             </Button>
           </Link>
-          <Link to='/'>
+          <Link to='/fpl-helper'>
             <IconButton aria-label="Go to homepage" color='secondary'>
               <HomeIcon />          
             </IconButton>
           </Link>
-          <Link to='/players'>
+          <Link to='/fpl-helper/players'>
             <IconButton aria-label="Go to homepage" color='secondary'>
               <PersonIcon />          
             </IconButton>
           </Link>
-          <Link to='/team'>
+          <Link to='/fpl-helper/team'>
             <IconButton aria-label="Go to homepage" color='secondary'>
               <GroupIcon />          
             </IconButton>
           </Link>
-          <Link to='/login'>
+          <Link to='/fpl-helper/login'>
             <IconButton aria-label="Go to homepage" color='secondary'>
               <ExitToAppIcon />          
             </IconButton>
@@ -639,8 +639,10 @@ function Content() {
 
   let match = useRouteMatch();
 
+  console.log(process.env.PUBLIC_URL + 'data/fpl_data.json')
+
   useEffect(() => {
-    fetch('/data/fpl_data.json', {method: 'GET'})
+    fetch(process.env.PUBLIC_URL + '/data/fpl_data.json', {method: 'GET'})
     .then(response => response.json())
     .then(json => {
       json['elements'].sort((a, b) => 
@@ -735,8 +737,8 @@ const useTeamStyles = makeStyles({
   field: {
     margin: 'auto',
     height: '80vh',
-    display: 'flex',
-    width: '80%'
+    display: 'block',
+    marginTop: '50px',
     //width: '35vh',
     //border: '1px solid black'
     // transform: 'rotate3d(1,0,0, 45deg)'
@@ -793,6 +795,7 @@ function Team() {
 
   return (
     <div>
+      <Typography variant='h2' align='center'>Your Team</Typography>
       <svg className={classes.field} viewBox='0 0 120 120' 
        xmlns="http://www.w3.org/2000/svg" onLoad={makeDraggable}>
         <defs>
@@ -930,16 +933,16 @@ function App() {
                 <Switch>
                   {/* A <Switch> looks through its children <Route>s and
                   renders the first one that matches the current URL. */}
-                  <Route path="/players">
+                  <Route path="/fpl-helper/players">
                     <Content />
                   </Route>
-                  <Route path='/login'>
+                  <Route path='/fpl-helper/login'>
                     <Login />
                   </Route>
-                  <Route path='/team'>
+                  <Route path='/fpl-helper/team'>
                     <Team />
                   </Route>
-                  <Route path="/">
+                  <Route path="/fpl-helper">
                     <Main />
                   </Route>
                 </Switch>
