@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/fpl-helper/static/css/main.27fd15f6.chunk.css",
-    "main.js": "/fpl-helper/static/js/main.11e343e6.chunk.js",
-    "main.js.map": "/fpl-helper/static/js/main.11e343e6.chunk.js.map",
+    "main.js": "/fpl-helper/static/js/main.5486a8f0.chunk.js",
+    "main.js.map": "/fpl-helper/static/js/main.5486a8f0.chunk.js.map",
     "runtime-main.js": "/fpl-helper/static/js/runtime-main.73f4de37.js",
     "runtime-main.js.map": "/fpl-helper/static/js/runtime-main.73f4de37.js.map",
     "static/js/2.1e0c6c49.chunk.js": "/fpl-helper/static/js/2.1e0c6c49.chunk.js",
     "static/js/2.1e0c6c49.chunk.js.map": "/fpl-helper/static/js/2.1e0c6c49.chunk.js.map",
     "index.html": "/fpl-helper/index.html",
-    "precache-manifest.535f49acd748ad308405a1d2aee1b204.js": "/fpl-helper/precache-manifest.535f49acd748ad308405a1d2aee1b204.js",
+    "precache-manifest.7685e3678daf393a605e95e3163cb001.js": "/fpl-helper/precache-manifest.7685e3678daf393a605e95e3163cb001.js",
     "service-worker.js": "/fpl-helper/service-worker.js",
     "static/css/main.27fd15f6.chunk.css.map": "/fpl-helper/static/css/main.27fd15f6.chunk.css.map",
     "static/js/2.1e0c6c49.chunk.js.LICENSE.txt": "/fpl-helper/static/js/2.1e0c6c49.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.73f4de37.js",
     "static/js/2.1e0c6c49.chunk.js",
     "static/css/main.27fd15f6.chunk.css",
-    "static/js/main.11e343e6.chunk.js"
+    "static/js/main.5486a8f0.chunk.js"
   ]
 }
