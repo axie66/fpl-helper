@@ -640,7 +640,7 @@ function Content() {
   let match = useRouteMatch();
 
   useEffect(() => {
-    fetch('/api/data', {method: 'GET'})
+    fetch('/data/fpl_data.json', {method: 'GET'})
     .then(response => response.json())
     .then(json => {
       json['elements'].sort((a, b) => 
